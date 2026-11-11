@@ -4,10 +4,10 @@ declare(strict_types=1);
 // Единая точка входа: все переходы идут через index.php?page=<имя>.
 require __DIR__ . '/../src/view.php';
 require __DIR__ . '/../src/notes.php';
+require __DIR__ . '/../src/session.php';
 
 session_start(); // до любого вывода HTML
 
-$userName = 'Гость';
 $page = $_GET['page'] ?? 'notes';
 
 try {
@@ -29,7 +29,13 @@ try {
 }
 
 $flash = pullFlash();
-render('layout', compact('title', 'content', 'userName', 'flash'));
+$userName = currentUser();
+try {
+    $users = loadJson('users');
+} catch (StorageException) {
+    $users = []; // ошибка уже показана на странице; шапка просто без списка
+}
+render('layout', compact('title', 'content', 'userName', 'users', 'flash'));
 
 /** Рендерит шаблон в строку, чтобы вставить его в layout. */
 function capture(string $template, array $data): string
@@ -46,6 +52,14 @@ function handlePost(string $action): never
         if ($action === 'add_note') {
             $error = addNote((string) ($_POST['title'] ?? ''));
             flash($error ? 'error' : 'ok', $error ?? 'Заметка добавлена.');
+        }
+        if ($action === 'set_user') {
+            $error = setUser((string) ($_POST['name'] ?? ''));
+            flash($error ? 'error' : 'ok', $error ?? 'Имя сохранено в session.');
+        }
+        if ($action === 'clear_user') {
+            clearUser();
+            flash('ok', 'Имя очищено, используется значение по умолчанию.');
         }
     } catch (StorageException $e) {
         flash('error', $e->getMessage());
