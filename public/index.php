@@ -5,6 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/../src/view.php';
 require __DIR__ . '/../src/notes.php';
 require __DIR__ . '/../src/session.php';
+require __DIR__ . '/../src/scenarios.php';
 
 session_start(); // до любого вывода HTML
 
@@ -17,6 +18,12 @@ try {
     if ($page === 'notes') {
         $title = 'Заметки';
         $content = capture('notes', ['notes' => loadNotes()]);
+    } elseif ($page === 'scenarios') {
+        $title = 'Сценарии session';
+        $scenarios = loadJson('session_scenarios');
+        // «Сейчас» — состояние последнего выполненного сценария, остальные показывают текущее состояние
+        $results = array_map(fn($s) => $_SESSION['last_run'][$s['scenario']] ?? actualState($s), $scenarios);
+        $content = capture('scenarios', compact('scenarios', 'results'));
     } else {
         http_response_code(404);
         $title = 'Страница не найдена';
@@ -52,6 +59,18 @@ function handlePost(string $action): never
         if ($action === 'add_note') {
             $error = addNote((string) ($_POST['title'] ?? ''));
             flash($error ? 'error' : 'ok', $error ?? 'Заметка добавлена.');
+        }
+        if ($action === 'run_scenario') {
+            $scenarios = loadJson('session_scenarios');
+            $s = $scenarios[(int) ($_POST['index'] ?? -1)] ?? null;
+            if ($s === null) {
+                flash('error', 'Неизвестный сценарий.');
+            } else {
+                $_SESSION['last_run'][$s['scenario']] = runScenario($s);
+                flash('ok', 'Сценарий «' . $s['scenario'] . '» выполнен.');
+            }
+            header('Location: index.php?page=scenarios');
+            exit;
         }
         if ($action === 'set_user') {
             $error = setUser((string) ($_POST['name'] ?? ''));
