@@ -2,6 +2,11 @@
 <section id="notes" class="hero">
     <span class="pill">заметки</span>
     <h1>Список учебных заметок</h1>
+    <form method="post" action="index.php?page=notes" class="inline">
+        <input type="hidden" name="action" value="add_note">
+        <input type="text" name="title" placeholder="Новая заметка" maxlength="120" required aria-label="Текст заметки">
+        <button class="btn" type="submit">Добавить</button>
+    </form>
     <?php if (!$notes): ?>
         <p class="muted">Заметок пока нет.</p>
     <?php else: ?>
