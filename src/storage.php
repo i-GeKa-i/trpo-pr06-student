@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-/** Ошибка чтения/записи файлового хранилища (показывается пользователю). */
+
 class StorageException extends RuntimeException {}
 
 const DATA_DIR = __DIR__ . '/../data';
 
-/** Читает data/<name>.json и возвращает массив. Бросает StorageException при проблеме. */
+
 function loadJson(string $name): array
 {
     $path = DATA_DIR . "/$name.json";
@@ -25,7 +25,7 @@ function loadJson(string $name): array
     return $data;
 }
 
-/** Записывает массив в data/<name>.json (с блокировкой, чтобы запросы не портили файл). */
+
 function saveJson(string $name, array $data): void
 {
     $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
