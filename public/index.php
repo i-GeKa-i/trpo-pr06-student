@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-// Единая точка входа: все переходы идут через index.php?page=<имя>.
+
 require __DIR__ . '/../src/view.php';
 require __DIR__ . '/../src/notes.php';
 require __DIR__ . '/../src/session.php';
 require __DIR__ . '/../src/scenarios.php';
 
-session_start(); // до любого вывода HTML
+session_start(); 
 
 $page = $_GET['page'] ?? 'notes';
 
@@ -21,7 +21,7 @@ try {
     } elseif ($page === 'scenarios') {
         $title = 'Сценарии session';
         $scenarios = loadJson('session_scenarios');
-        // «Сейчас» — состояние последнего выполненного сценария, остальные показывают текущее состояние
+
         $results = array_map(fn($s) => $_SESSION['last_run'][$s['scenario']] ?? actualState($s), $scenarios);
         $content = capture('scenarios', compact('scenarios', 'results'));
     } else {
@@ -40,11 +40,11 @@ $userName = currentUser();
 try {
     $users = loadJson('users');
 } catch (StorageException) {
-    $users = []; // ошибка уже показана на странице; шапка просто без списка
+    $users = []; 
 }
 render('layout', compact('title', 'content', 'userName', 'users', 'flash'));
 
-/** Рендерит шаблон в строку, чтобы вставить его в layout. */
+
 function capture(string $template, array $data): string
 {
     ob_start();
@@ -52,7 +52,7 @@ function capture(string $template, array $data): string
     return (string) ob_get_clean();
 }
 
-/** Обработчик POST-действий: меняет данные и делает redirect (Post/Redirect/Get). */
+
 function handlePost(string $action): never
 {
     try {
@@ -92,7 +92,6 @@ function flash(string $type, string $text): void
     $_SESSION['flash'][] = ['type' => $type, 'text' => $text];
 }
 
-/** Возвращает и очищает одноразовые сообщения. */
 function pullFlash(): array
 {
     $f = $_SESSION['flash'] ?? [];
