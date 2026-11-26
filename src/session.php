@@ -5,13 +5,13 @@ require_once __DIR__ . '/storage.php';
 
 const DEFAULT_USER = 'Гость';
 
-/** Имя текущего пользователя из session (или значение по умолчанию). */
+
 function currentUser(): string
 {
     return $_SESSION['display_name'] ?? DEFAULT_USER;
 }
 
-/** Сохраняет имя в session, только если такой пользователь есть в users.json. */
+
 function setUser(string $name): ?string
 {
     $names = array_column(loadJson('users'), 'name');
