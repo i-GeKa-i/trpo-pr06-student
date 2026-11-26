@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/session.php';
 
-/**
- * Выполняет сценарий из session_scenarios.json над session и
- * возвращает фактическое состояние: guest_or_default | default | stored.
- */
+
 function runScenario(array $s): string
 {
     switch ($s['scenario']) {
@@ -21,7 +18,7 @@ function runScenario(array $s): string
     return actualState($s);
 }
 
-/** Сопоставляет текущее состояние session с терминами из поля expected. */
+
 function actualState(array $s): string
 {
     $name = currentUser();
